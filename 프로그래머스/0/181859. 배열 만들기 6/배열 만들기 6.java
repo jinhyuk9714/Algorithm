@@ -11,14 +11,6 @@ class Solution {
                 stk.push(arr[i]);
             }
         }
-        if (stk.isEmpty()) {
-            return new int[]{-1};
-        }
-        int[] result = new int[stk.size()];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = stk.get(i);
-        }
-
-        return result;
+        return stk.isEmpty() ? new int[]{-1} : stk.stream().mapToInt(i -> i).toArray();
     }
 }
