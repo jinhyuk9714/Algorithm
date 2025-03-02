@@ -6,7 +6,6 @@ class Solution {
         for (int i = 0; i < n; i++) {
             String n1 = String.format("%" + n + "s", Integer.toBinaryString(arr1[i])).replace(' ', '0');
             String n2 = String.format("%" + n + "s", Integer.toBinaryString(arr2[i])).replace(' ', '0');
-
             sb = new StringBuilder();
             for (int j = 0; j < n; j++) {
                 if (n1.charAt(j) == '1' || n2.charAt(j) == '1') {
