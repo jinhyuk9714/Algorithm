@@ -1,46 +1,59 @@
-def split_melody(melody_str):
-    result = []
-    i = 0
-    while i < len(melody_str):
-        if i + 1 < len(melody_str) and melody_str[i + 1] == '#':
-            result.append(melody_str[i] + '#')
-            i += 2
-        else:
-            result.append(melody_str[i])
-            i += 1
-    return result
+def normalize_melody(melody):
+    """
+    # 멜로디를 통일된 형식으로 변환
+    # C#, D# 등을 소문자로 치환해 'C'와 'C#'을 구분 가능하게 만듦
+    """
+    return melody.replace('C#', 'c')\
+                 .replace('D#', 'd')\
+                 .replace('F#', 'f')\
+                 .replace('G#', 'g')\
+                 .replace('A#', 'a')\
+                 .replace('B#', 'b')
 
 
 def to_minutes(time_str):
+    """문자열 시각을 분 단위로 변환"""
     h, m = map(int, time_str.split(":"))
     return h * 60 + m
 
 
-def get_play_time(start, end):
-    start_min = to_minutes(start)
-    end_min = to_minutes(end)
-    if end_min < start_min:
-        end_min += 24 * 60
-    return end_min - start_min
-
-
 def solution(m, musicinfos):
-    answer = None
+    m = normalize_melody(m)
+    answer = "(None)"
     max_duration = -1
-    m_arr = split_melody(m)
 
     for info in musicinfos:
-        start_time, end_time, title, melody = info.split(',')
-        duration = get_play_time(start_time, end_time)
+        start, end, title, melody = info.split(',')
+        start_min = to_minutes(start)
+        end_min = to_minutes(end)
 
-        melody_arr = split_melody(melody)
-        played_melody = (melody_arr * ((duration // len(melody_arr)) + 1))[:duration]
+        duration = end_min - start_min
+        if duration < 0:  # 자정 넘김 보정
+            duration += 24 * 60
 
-        for i in range(len(played_melody) - len(m_arr) + 1):
-            if played_melody[i:i + len(m_arr)] == m_arr:
-                if duration > max_duration:
-                    max_duration = duration
-                    answer = title
-                break
+        # 멜로디 변환
+        melody = normalize_melody(melody)
 
-    return answer if answer else "(None)"
+        # 재생된 멜로디 생성
+        full_melody = (melody * (duration // len(melody) + 1))[:duration]
+
+        # 기억한 멜로디가 포함되어 있는지 확인
+        if m in full_melody:
+            if duration > max_duration:  # 가장 긴 곡 우선
+                max_duration = duration
+                answer = title
+
+    return answer
+
+
+m = "ABCDEFG"
+musicinfos = ["12:00,12:14,HELLO,CDEFGAB", "13:00,13:05,WORLD,ABCDEF"]
+print(solution(m, musicinfos))  # "HELLO"
+
+m = "CC#BCC#BCC#BCC#B"
+musicinfos = ["03:00,03:30,FOO,CC#B", "04:00,04:08,BAR,CC#BCC#BCC#B"]
+print(solution(m, musicinfos))  # "FOO"
+
+m = "ABC"
+musicinfos = ["12:00,12:14,HELLO,C#DEFGAB", "13:00,13:05,WORLD,ABCDEF"]
+print(solution(m, musicinfos))  # "WORLD"
