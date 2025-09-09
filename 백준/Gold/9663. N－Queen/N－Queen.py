@@ -1,20 +1,24 @@
-n = int(input())
-result = 0
+import sys
 
-col_used = [False] * n
-diag1 = [False] * (2 * n)  # ↘: row + col
-diag2 = [False] * (2 * n)  # ↙: row - col + n
+sys.setrecursionlimit(1_000_000)
 
-def dfs(row):
-    global result
-    if row == n:
-        result += 1
+n = int(sys.stdin.readline().strip())
+
+full = (1 << n) - 1
+ans = 0
+
+
+def dfs(cols, d1, d2):
+    global ans
+    if cols == full:
+        ans += 1
         return
-    for col in range(n):
-        if not col_used[col] and not diag1[row + col] and not diag2[row - col + n]:
-            col_used[col] = diag1[row + col] = diag2[row - col + n] = True
-            dfs(row + 1)
-            col_used[col] = diag1[row + col] = diag2[row - col + n] = False
+    avail = ~(cols | d1 | d2) & full
+    while avail:
+        bit = avail & -avail
+        avail -= bit
+        dfs(cols | bit, (d1 | bit) << 1, (d2 | bit) >> 1)
 
-dfs(0)
-print(result)
+
+dfs(0, 0, 0)
+print(ans)
