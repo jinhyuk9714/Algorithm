@@ -5,23 +5,21 @@ input = sys.stdin.readline
 S = input().strip()
 q = int(input())
 
-queries = []
-for _ in range(q):
-    c, l, r = input().split()
-    l = int(l)
-    r = int(r)
-    queries.append((c, l, r))
+queries = [input().split() for _ in range(q)]  # c, l, r (문자, 문자열, 문자열)
 
-P = [[0] * (len(S) + 1) for _ in range(26)]
+n = len(S)
+P = [[0] * 26 for _ in range(n + 1)]  # P[i][k] = S[:i]에서 문자 k의 개수 (k=0..25)
 
-for i, ch in enumerate(S):
-    idx = ord(ch) - ord('a')
-    for k in range(26):
-        P[k][i + 1] = P[k][i]
-    P[idx][i + 1] += 1
+for i, ch in enumerate(S, start=1):  # i: 1..n
+    row = P[i - 1][:]  # 이전 행을 통째로 복사 (26개 한 번에)
+    row[ord(ch) - 97] += 1  # 이번 글자만 +1
+    P[i] = row
 
 out = []
 for c, l, r in queries:
-    k = ord(c) - ord('a')
-    out.append(str(P[k][r + 1] - P[k][l]))
+    l = int(l)
+    r = int(r)
+    k = ord(c) - 97
+    out.append(str(P[r + 1][k] - P[l][k]))
+
 print('\n'.join(out))
