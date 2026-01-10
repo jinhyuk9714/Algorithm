@@ -2,17 +2,19 @@ import sys
 
 input = sys.stdin.readline
 
-s = input().strip()
-t = input().strip()
-n, m = len(s), len(t)
+A = input().strip()
+B = input().strip()
 
-dp = [[0] * (m + 1) for _ in range(n + 1)]
+N = len(A)
+M = len(B)
 
-for i in range(1, n + 1):
-    for j in range(1, m + 1):
-        if s[i - 1] == t[j - 1]:
+dp = [[0] * (M + 1) for _ in range(N + 1)]
+
+for i in range(1, N + 1):
+    for j in range(1, M + 1):
+        if A[i - 1] == B[j - 1]:
             dp[i][j] = dp[i - 1][j - 1] + 1
         else:
             dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
 
-print(dp[n][m])
+print(dp[N][M])
